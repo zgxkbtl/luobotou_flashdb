@@ -6,9 +6,11 @@ import strawberry
 from strawberry.fastapi import GraphQLRouter, BaseContext
 from strawberry.types import Info
 from typing import Union, Optional
-from fastapi import FastAPI, Depends
+from fastapi import Depends
 from neo4j import GraphDatabase, basic_auth
 from enum import Enum
+
+from ..dependencies import custom_context_dependency, CustomContext
 
 # resolvers
 def driver_meta_resolver(root: ControllerMeta, info: Info,
@@ -349,19 +351,6 @@ class Mutation:
             return resolver_result
 
 
-# 从文件里读取数据库的用户名和密码
-with open("neo4j.txt", "r") as f:
-    username, password = f.read().split("\n")
-
-
-driver = GraphDatabase.driver("neo4j+s://5c0c176e.databases.neo4j.io", auth=basic_auth(username, password))
-
-class CustomContext(BaseContext):
-    def __init__(self):
-        self.driver: neo4j.Driver = driver
-
-def custom_context_dependency() -> CustomContext:
-    return CustomContext()
 
 async def get_context(custom_context=Depends(custom_context_dependency),):
     return custom_context

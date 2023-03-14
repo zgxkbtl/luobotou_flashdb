@@ -1,14 +1,14 @@
 from fastapi import Depends, FastAPI
-from models import DriverMeta
-from neo4j import GraphDatabase, basic_auth
-from graph_ql import graphql_app, driver
+from .models import DriverMeta
+from .graphqlmodules.graph_ql import graphql_app
 from strawberry.fastapi import BaseContext
+from .dependencies import driver
 
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 app.include_router(graphql_app, prefix="/graphql")
-# cors
+
 origins = [
     "*"
 ]
@@ -20,6 +20,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 
 @app.on_event('startup')
